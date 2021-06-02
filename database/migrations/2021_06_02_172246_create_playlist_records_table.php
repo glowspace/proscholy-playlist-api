@@ -13,18 +13,17 @@ class CreatePlaylistRecordsTable extends Migration
      */
     public function up()
     {
-        Schema::create('playlist_records', function (Blueprint $table) {
+        Schema::create('playlist_records', function (Blueprint $table)
+        {
             $table->id();
             $table->unsignedInteger('playlist_id');
             $table->unsignedInteger('song_lyric_id')->nullable();
-            $table->string('title');
+            $table->string('title')->nullable();
             $table->unsignedInteger('order');
             $table->timestamps();
-
-            $table->foreign('playlist_id')->references('id')->on('playlists')
-                ->onUpdate('cascade')->onDelete('cascade');
         });
     }
+
 
     /**
      * Reverse the migrations.
