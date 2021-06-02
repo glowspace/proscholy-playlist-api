@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\IndexController;
-use App\Http\Controllers\Api\PlaylistController;
+use App\Http\Controllers\Api\UserPlaylistController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -23,4 +23,4 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 Route::get('/', [IndexController::class, 'index']);
 Route::get('/test/login', [IndexController::class, 'login']);
 
-Route::apiResource('playlists', PlaylistController::class);
+Route::apiResource('playlists', UserPlaylistController::class);
