@@ -3,10 +3,23 @@
 namespace App\Http\Controllers;
 
 use App\Models\Playlist;
+use App\Repository\PlaylistRepository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class PlaylistController extends Controller
 {
+    /**
+     * @var PlaylistRepository
+     */
+    private $playlistRepository;
+
+
+    public function __construct(PlaylistRepository $playlistRepository)
+    {
+        $this->playlistRepository = $playlistRepository;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -14,7 +27,7 @@ class PlaylistController extends Controller
      */
     public function index()
     {
-        //
+        $playlists = $this->playlistRepository->getUserPlaylists(Auth::user());
     }
 
     /**
