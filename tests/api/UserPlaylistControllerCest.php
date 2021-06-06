@@ -11,10 +11,10 @@ class UserPlaylistControllerCest
 {
     public function _before(ApiTester $I)
     {
+
     }
 
 
-    // tests
     public function indexPlaylists(ApiTester $I)
     {
         $I->sendGet('/api/playlists');

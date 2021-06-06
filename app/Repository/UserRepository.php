@@ -9,7 +9,7 @@ use App\Models\User;
 class UserRepository
 {
 
-    public function getAuthUser()
+    public function getAuthUser():User
     {
         return User::first();
     }

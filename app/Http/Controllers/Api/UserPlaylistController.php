@@ -7,10 +7,10 @@ use App\Models\Playlist;
 use App\Models\User;
 use App\Repository\PlaylistRepository;
 use App\Repository\UserRepository;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Validation\UnauthorizedException;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * Class UserPlaylistController
@@ -37,6 +37,9 @@ class UserPlaylistController extends Controller
     ) {
         $this->playlistRepository = $playlistRepository;
         $this->userRepository     = $userRepository;
+
+        // TODO: only for early prototyping!!!
+        Auth::login(User::first());
     }
 
 
@@ -48,7 +51,6 @@ class UserPlaylistController extends Controller
     public function index(): Response
     {
         $auth_user = $this->userRepository->getAuthUser();
-
         $playlists = $this->playlistRepository->getUserPlaylistsWithRecords($auth_user);
 
         return new Response($playlists);
@@ -61,11 +63,13 @@ class UserPlaylistController extends Controller
      * @param Request $request
      *
      * @return Response
+     * @throws AuthorizationException
      */
     public function store(Request $request): Response
     {
-        $auth_user = $this->userRepository->getAuthUser();
-        $playlist  = $this->playlistRepository->createUserPlaylist($request['name'], $auth_user, true);
+        $this->authorize('create', Playlist::class);
+
+        $playlist = $this->playlistRepository->createUserPlaylist($request['name'], Auth::user(), true);
 
         return new Response($playlist);
     }
@@ -77,12 +81,11 @@ class UserPlaylistController extends Controller
      * @param Playlist $playlist
      *
      * @return Response
+     * @throws AuthorizationException
      */
     public function show(Playlist $playlist): Response
     {
-        $auth_user = $this->userRepository->getAuthUser();
-
-        $this->checkIfUserCanReadPlaylist($playlist, $auth_user);
+        $this->authorize('view', $playlist);
 
         return new Response($playlist);
     }
@@ -95,10 +98,18 @@ class UserPlaylistController extends Controller
      * @param Playlist $playlist
      *
      * @return Response
+     * @throws AuthorizationException
      */
-    public function update(Request $request, Playlist $playlist)
+    public function update(Request $request, Playlist $playlist): Response
     {
-        //
+        $this->authorize('update', $playlist);
+
+        $playlist->name       = $request['name'];
+        $playlist->is_private = $request['is_private'];
+        $playlist->datetime   = $request['datetime'];
+        $playlist->save();
+
+        return new Response($playlist);
     }
 
 
@@ -108,56 +119,15 @@ class UserPlaylistController extends Controller
      * @param Playlist $playlist
      *
      * @return Response
+     * @throws AuthorizationException
      */
-    public function destroy(Playlist $playlist)
+    public function destroy(Playlist $playlist): Response
     {
-        $auth_user = $this->userRepository->getAuthUser();
-
-        $this->checkIfUserCanReadPlaylist($playlist, $auth_user);
-        $this->checkIfUserCanUpdatePlaylist($playlist, $auth_user);
+        $this->authorize('delete', $playlist);
 
         $playlist->playlist_records()->delete();
         $playlist->delete();
 
         return new Response('Playlist deleted.', Response::HTTP_NO_CONTENT);
-    }
-
-
-    /**
-     * @param Playlist $playlist
-     * @param User     $auth_user
-     *
-     * @return void
-     */
-    private function checkIfUserCanReadPlaylist(Playlist $playlist, User $auth_user): void
-    {
-        // Playlist is public.
-        if ( ! $playlist->is_private)
-        {
-            return;
-        }
-
-        // Playlist is owned by user.
-        if ($playlist->user_id == $auth_user->id)
-        {
-            return;
-        }
-
-        // User cannot read this playlist.
-        throw new UnauthorizedException("User cannot read this playlist.", 403);
-    }
-
-
-    private function checkIfUserCanUpdatePlaylist(Playlist $playlist, $auth_user)
-    {
-        // Playlist is owned by user.
-        if ($playlist->user_id == $auth_user->id)
-        {
-            return;
-        }
-
-        // User cannot read this playlist.
-        throw new AccessDeniedHttpException("User cannot manipulate with this playlist.");
-
     }
 }

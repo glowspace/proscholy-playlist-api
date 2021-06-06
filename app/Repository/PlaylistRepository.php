@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Models\Group;
 use App\Models\Playlist;
 use App\Models\User;
 
@@ -11,6 +12,12 @@ class PlaylistRepository
     public function getUserPlaylistsWithRecords(User $user)
     {
         return $user->playlists->load('playlist_records');
+    }
+
+
+    public function getGroupPlaylistsWithRecords(Group $group)
+    {
+        return $group->playlists->load('playlist_records');
     }
 
 
@@ -24,4 +31,6 @@ class PlaylistRepository
 
         return $playlist;
     }
+
+
 }
