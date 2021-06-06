@@ -47,4 +47,15 @@ class GroupRepository extends Repository
     {
         $group->users()->detach();
     }
+
+
+    public function checkIfAlreadyMember(Group $group, $member): bool
+    {
+        if ($group->users()->contain($member))
+        {
+            return true;
+        }
+
+        return false;
+    }
 }
