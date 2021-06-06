@@ -1,8 +1,7 @@
 <?php
 
-use App\Http\Controllers\IndexController;
 use App\Http\Controllers\Api\UserPlaylistController;
-use Illuminate\Http\Request;
+use App\Http\Controllers\IndexController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -19,3 +18,10 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [IndexController::class, 'index']);
 
 Route::apiResource('playlists', UserPlaylistController::class);
+
+Route::group([
+    'prefix' => '/group/{group}',
+], function ()
+{
+
+});

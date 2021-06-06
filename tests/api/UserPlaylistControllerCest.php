@@ -15,7 +15,7 @@ class UserPlaylistControllerCest
     }
 
 
-    public function indexPlaylists(ApiTester $I)
+    public function testIndexPlaylistsTest(ApiTester $I)
     {
         $I->sendGet('/api/playlists');
 
@@ -28,7 +28,7 @@ class UserPlaylistControllerCest
     {
         $I->sendPost('/api/playlists', [
             'name'       => 'Nový playlist',
-            'is_private' => false,
+            'is_private' => true,
         ]);
 
         $I->seeResponseCodeIs(HttpCode::OK);
@@ -52,12 +52,29 @@ class UserPlaylistControllerCest
     }
 
 
-    public function tryToShowSomeonePrivatePlaylist(ApiTester $I)
+    public function tryToShowSomeonesPrivatePlaylist(ApiTester $I)
     {
         $I->sendGet('/api/playlists/4');
 
         $I->seeResponseCodeIs(HttpCode::FORBIDDEN);
         $I->seeResponseIsJson();
+    }
+
+
+    public function updatePlaylist(ApiTester $I)
+    {
+        $id = $this->preparePlaylist($I);
+
+        $I->sendPatch('/api/playlists/' . $id, [
+            'name'       => 'Nový název',
+            'is_private' => false,
+        ]);
+
+        $I->seeResponseCodeIs(HttpCode::OK);
+        $I->seeResponseContainsJson([
+            'name'       => 'Nový název',
+            'is_private' => false,
+        ]);
     }
 
 
@@ -85,5 +102,5 @@ class UserPlaylistControllerCest
         $id = $I->grabDataFromResponseByJsonPath('id');
 
         return $id[0];
-}
+    }
 }

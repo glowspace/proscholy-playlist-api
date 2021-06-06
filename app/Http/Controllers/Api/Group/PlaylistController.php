@@ -41,12 +41,9 @@ class PlaylistController extends Controller
      */
     public function index($group_id): Response
     {
-        $group_id = Group::findOrFail($group_id);
-        $auth_user = $this->userRepository->getAuthUser();
+        $group = Group::findOrFail($group_id);
 
-
-
-        $playlists = $this->playlistRepository->getGroupPlaylistsWithRecords($auth_user);
+        $playlists = $this->playlistRepository->getGroupPlaylistsWithRecords($group);
 
         return new Response($playlists);
     }
@@ -57,9 +54,9 @@ class PlaylistController extends Controller
      *
      * @return Response
      */
-    public function create()
+    public function create($group_id)
     {
-        //
+        $group = Group::findOrFail($group_id);
     }
 
 
