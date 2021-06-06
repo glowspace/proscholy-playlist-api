@@ -3,6 +3,7 @@
 namespace App\Exceptions;
 
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -61,6 +62,11 @@ class Handler extends ExceptionHandler
         if ($exception instanceof AuthorizationException)
         {
             $code = 403;
+        }
+
+        if ($exception instanceof ModelNotFoundException)
+        {
+            $code = 404;
         }
 
         $message = [

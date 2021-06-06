@@ -67,13 +67,13 @@ class UserPlaylistControllerCest
 
         $I->sendPatch('/api/playlists/' . $id, [
             'name'       => 'Nový název',
-            'is_private' => false,
+            'is_private' => '0',
         ]);
 
         $I->seeResponseCodeIs(HttpCode::OK);
         $I->seeResponseContainsJson([
             'name'       => 'Nový název',
-            'is_private' => false,
+            'is_private' => '0',
         ]);
     }
 

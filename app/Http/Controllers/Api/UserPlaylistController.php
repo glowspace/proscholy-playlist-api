@@ -7,6 +7,7 @@ use App\Models\Playlist;
 use App\Models\User;
 use App\Repository\PlaylistRepository;
 use App\Repository\UserRepository;
+use Carbon\Carbon;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -15,7 +16,8 @@ use Illuminate\Support\Facades\Auth;
 /**
  * Class UserPlaylistController
  *
- * @see     \UserPlaylistControllerCest
+ * @see     \UserPlaylistControllerCes,
+ * t
  * @package App\Http\Controllers\Api
  */
 class UserPlaylistController extends Controller
@@ -103,10 +105,27 @@ class UserPlaylistController extends Controller
     public function update(Request $request, Playlist $playlist): Response
     {
         $this->authorize('update', $playlist);
+        $this->validate($request, [
+            'name'       => 'string',
+            'is_private' => 'bool',
+            'datetime'   => 'date',
+        ]);
 
-        $playlist->name       = $request['name'];
-        $playlist->is_private = $request['is_private'];
-        $playlist->datetime   = $request['datetime'];
+        if ($request->has('name'))
+        {
+            $playlist->name = $request['name'];
+        }
+
+        if ($request->has('is_private'))
+        {
+            $playlist->is_private = $request['is_private'];
+        }
+
+        if ($request->has('datetime'))
+        {
+            $playlist->datetime = Carbon::parse($request['datetime']);
+        }
+
         $playlist->save();
 
         return new Response($playlist);

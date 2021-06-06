@@ -5,8 +5,6 @@ namespace App\Policies;
 use App\Models\Playlist;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
-use Illuminate\Auth\Access\Response;
-use Illuminate\Http\Response as Res;
 
 class PlaylistPolicy
 {
@@ -38,6 +36,8 @@ class PlaylistPolicy
 
             return true;
         }
+
+        throw new \Exception('Invalid playlist type during authorization.');
     }
 
 
@@ -64,8 +64,11 @@ class PlaylistPolicy
     {
         if ($playlist->isUserPlaylist())
         {
-            $this->playlistMustBeUserPlaylist($playlist);
-            $this->checkIfUserIsOwnerOfPlaylist($playlist, $user);
+            // User must be owner of playlist.
+            if ( ! $this->checkIfUserIsOwnerOfPlaylist($playlist, $user))
+            {
+                return false;
+            }
         }
 
         return true;
@@ -84,22 +87,14 @@ class PlaylistPolicy
     {
         if ($playlist->isUserPlaylist())
         {
-            $this->playlistMustBeUserPlaylist($playlist);
-            $this->checkIfUserIsOwnerOfPlaylist($playlist, $user);
+            // User must be owner of playlist.
+            if ( ! $this->checkIfUserIsOwnerOfPlaylist($playlist, $user))
+            {
+                return false;
+            }
         }
 
         return true;
-    }
-
-
-    private function playlistMustBeUserPlaylist(Playlist $playlist): void
-    {
-        if ($playlist->user_id)
-        {
-            return;
-        }
-
-        Response::deny('Personal playlist with this id not found.', Res::HTTP_NOT_FOUND);
     }
 
 
