@@ -38,4 +38,25 @@ class Playlist extends Model
 
         return $record;
     }
+
+
+    public function isUserPlaylist(): bool
+    {
+        if($this->user_id)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function isGroupPlaylist(): bool
+    {
+        if($this->group_id)
+        {
+            return true;
+        }
+
+        return false;
+    }
 }

@@ -38,6 +38,9 @@ class UserPlaylistControllerCest
     }
 
 
+    /**
+     * @throws Exception
+     */
     public function showPlaylist(ApiTester $I)
     {
         $id = $this->preparePlaylist($I);
