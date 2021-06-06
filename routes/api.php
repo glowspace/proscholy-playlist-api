@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\Group\PlaylistController;
 use App\Http\Controllers\Api\UserPlaylistController;
 use App\Http\Controllers\IndexController;
 use Illuminate\Support\Facades\Route;
@@ -23,5 +24,5 @@ Route::group([
     'prefix' => '/group/{group}',
 ], function ()
 {
-
+    Route::apiResource('playlists', PlaylistController::class);
 });

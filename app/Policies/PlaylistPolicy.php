@@ -4,6 +4,7 @@ namespace App\Policies;
 
 use App\Models\Playlist;
 use App\Models\User;
+use Exception;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class PlaylistPolicy
@@ -17,6 +18,7 @@ class PlaylistPolicy
      * @param Playlist $playlist
      *
      * @return bool
+     * @throws Exception
      */
     public function view(User $user, Playlist $playlist): bool
     {
@@ -37,7 +39,7 @@ class PlaylistPolicy
             return true;
         }
 
-        throw new \Exception('Invalid playlist type during authorization.');
+        throw new Exception('Invalid playlist type during authorization.');
     }
 
 

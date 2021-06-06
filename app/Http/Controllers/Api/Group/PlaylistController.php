@@ -9,6 +9,12 @@ use App\Repository\UserRepository;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
+/**
+ * Class PlaylistController
+ *
+ * @see
+ * @package App\Http\Controllers\Api\Group
+ */
 class PlaylistController extends Controller
 {
 
