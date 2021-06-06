@@ -6,10 +6,10 @@ namespace App\Repository;
 
 use App\Models\User;
 
-class UserRepository
+class UserRepository extends Repository
 {
 
-    public function getAuthUser():User
+    public function getAuthUser(): User
     {
         return User::first();
     }

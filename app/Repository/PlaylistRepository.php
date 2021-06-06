@@ -6,7 +6,7 @@ use App\Models\Group;
 use App\Models\Playlist;
 use App\Models\User;
 
-class PlaylistRepository
+class PlaylistRepository extends Repository
 {
 
     public function getUserPlaylistsWithRecords(User $user)

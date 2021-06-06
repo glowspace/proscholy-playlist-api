@@ -2,6 +2,7 @@
 
 namespace App\Exceptions;
 
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -61,14 +62,25 @@ class Handler extends ExceptionHandler
         $response = [];
 
         $response['message'] = $exception->getMessage();
+        $response['code']    = $error->getStatusCode();
 
         if ($exception instanceof NotFoundHttpException)
         {
             $response['message'] = 'Page not found';
         }
 
-        $response['code'] = $exception->getCode();
+        // Model not found
+        if ($exception instanceof ModelNotFoundException)
+        {
+            $response['code'] = 404;
 
+            if (!Config::get('app.debug'))
+            {
+                $response['message'] = 'Entity not found.';
+            }
+        }
+
+        // Trace
         if (Config::get('app.debug'))
         {
             $response['trace'] = $exception->getTraceAsString();
