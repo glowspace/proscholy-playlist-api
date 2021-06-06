@@ -104,6 +104,11 @@ class GroupController extends Controller
     }
 
 
+    /**
+     * @throws AuthorizationException
+     * @throws ValidationException
+     * @throws Exception
+     */
     public function addMember(Group $group, Request $request): Response
     {
         $this->authorize('update', $group);
@@ -156,6 +161,7 @@ class GroupController extends Controller
     /**
      * @throws AuthorizationException
      * @throws ValidationException
+     * @throws Exception
      */
     public function deleteMember(Group $group, Request $request): Response
     {
@@ -171,7 +177,6 @@ class GroupController extends Controller
         {
             throw new Exception("User is not member of this group.", 403);
         }
-
 
         $this->group_repository->removeMember($group, $member);
 
