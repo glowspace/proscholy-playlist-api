@@ -2,12 +2,12 @@
 
 namespace App\Exceptions;
 
-use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Config;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -57,23 +57,23 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Throwable $exception)
     {
-        $code = $exception->getCode() ? $exception->getCode() : 500;
+        $error    = $this->convertExceptionToResponse($exception);
+        $response = [];
 
-        if ($exception instanceof AuthorizationException)
+        $response['message'] = $exception->getMessage();
+
+        if ($exception instanceof NotFoundHttpException)
         {
-            $code = 403;
+            $response['message'] = 'Page not found';
         }
 
-        if ($exception instanceof ModelNotFoundException)
+        $response['code'] = $exception->getCode();
+
+        if (Config::get('app.debug'))
         {
-            $code = 404;
+            $response['trace'] = $exception->getTraceAsString();
         }
 
-        $message = [
-            'message' => $exception->getMessage(),
-            'code'    => $code,
-        ];
-
-        return response()->json($message, $code);
+        return response()->json($response, $error->getStatusCode());
     }
 }
