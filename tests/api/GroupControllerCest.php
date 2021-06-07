@@ -6,6 +6,7 @@ class GroupControllerCest
 {
     public function _before(ApiTester $I)
     {
+
     }
 
 
