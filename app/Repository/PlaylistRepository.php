@@ -21,11 +21,23 @@ class PlaylistRepository extends Repository
     }
 
 
-    public function createUserPlaylist($name, User $user, bool $private)
+    public function createUserPlaylist($name, User $user, bool $private): Playlist
     {
         $playlist             = new Playlist();
         $playlist->name       = $name;
         $playlist->user_id    = $user->id;
+        $playlist->is_private = $private;
+        $playlist->save();
+
+        return $playlist;
+    }
+
+
+    public function createGroupPlaylist($name, Group $group, bool $private): Playlist
+    {
+        $playlist             = new Playlist();
+        $playlist->name       = $name;
+        $playlist->group_id   = $group->id;
         $playlist->is_private = $private;
         $playlist->save();
 

@@ -2,6 +2,11 @@
 
 use Codeception\Util\HttpCode;
 
+/**
+ * Class GroupControllerCest
+ *
+ * @see \App\Http\Controllers\Api\GroupController
+ */
 class GroupControllerCest
 {
     public function _before(ApiTester $I)
@@ -10,7 +15,7 @@ class GroupControllerCest
     }
 
 
-    // tests
+
     public function indexGroups(ApiTester $I)
     {
         $I->sendGet('/api/groups');

@@ -4,15 +4,19 @@ namespace App\Http\Controllers\Api\Group;
 
 use App\Http\Controllers\Controller;
 use App\Models\Group;
+use App\Models\Playlist;
+use App\Models\User;
 use App\Repository\PlaylistRepository;
 use App\Repository\UserRepository;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * Class PlaylistController
  *
- * @see
+ * @see     \GroupPlaylistControllerCest
  * @package App\Http\Controllers\Api\Group
  */
 class PlaylistController extends Controller
@@ -35,6 +39,9 @@ class PlaylistController extends Controller
     ) {
         $this->playlistRepository = $playlistRepository;
         $this->userRepository     = $userRepository;
+
+        // TODO: only for early prototyping!!!
+        Auth::login(User::first());
     }
 
 
@@ -59,36 +66,35 @@ class PlaylistController extends Controller
      * Show the form for creating a new resource.
      *
      * @return Response
+     * @throws AuthorizationException
      */
-    public function create($group_id)
+    public function store($group_id, Request $request)
     {
         $group = Group::findOrFail($group_id);
-    }
 
+        $this->authorize('create', [Playlist::class, $group]);
+        $playlist = $this->playlistRepository->createGroupPlaylist($request['name'], $group, true);
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param Request $request
-     *
-     * @return Response
-     */
-    public function store(Request $request)
-    {
-        //
+        return new Response($playlist);
     }
 
 
     /**
      * Display the specified resource.
      *
-     * @param int $id
+     * @param          $group_id
+     * @param Playlist $playlist
      *
      * @return Response
+     * @throws AuthorizationException
+     * @see \GroupPlaylistControllerCest::showGroupPlaylist()
      */
-    public function show($id)
+    public function show($group_id, Playlist $playlist)
     {
-        //
+        $group = Group::findOrFail($group_id);
+        $this->authorize('view', [$playlist, $group]);
+
+        return new Response($playlist);
     }
 
 

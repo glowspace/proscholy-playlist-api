@@ -39,6 +39,9 @@ class UserPlaylistController extends Controller
     ) {
         $this->playlistRepository = $playlistRepository;
         $this->userRepository     = $userRepository;
+
+        // TODO: only for early prototyping!!!
+        Auth::login(User::first());
     }
 
 
@@ -49,8 +52,7 @@ class UserPlaylistController extends Controller
      */
     public function index(): Response
     {
-        $auth_user = $this->userRepository->getAuthUser();
-        $playlists = $this->playlistRepository->getUserPlaylistsWithRecords($auth_user);
+        $playlists = $this->playlistRepository->getUserPlaylistsWithRecords(Auth::user());
 
         return new Response($playlists);
     }
@@ -66,7 +68,7 @@ class UserPlaylistController extends Controller
      */
     public function store(Request $request): Response
     {
-        $this->authorize('create', Playlist::class);
+//        $this->authorize('create', Playlist::class);
 
         $playlist = $this->playlistRepository->createUserPlaylist($request['name'], Auth::user(), true);
 

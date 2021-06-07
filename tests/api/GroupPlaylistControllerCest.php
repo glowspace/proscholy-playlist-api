@@ -10,20 +10,12 @@ class GroupPlaylistControllerCest
     protected $tester;
 
 
-    protected function _before()
-    {
-    }
-
-
-    protected function _after()
-    {
-    }
-
-
     // tests
     public function indexGroupPlaylists(ApiTester $I)
     {
-        $I->sendGet('/api/group/1/playlists');
+        $group_id = $this->prepareGroup($I);
+
+        $I->sendGet('/api/group/' . $group_id . '/playlists');
 
         $I->seeResponseCodeIs(HttpCode::OK);
         $I->seeResponseIsJson();
@@ -32,12 +24,14 @@ class GroupPlaylistControllerCest
 
     /**
      * @throws Exception
+     * @see \App\Http\Controllers\Api\Group\PlaylistController::show()
      */
     public function showGroupPlaylist(ApiTester $I)
     {
-        $id = $this->prepareGroupPlaylist($I);
+        $group_id = $this->prepareGroup($I);
+        $id       = $this->prepareGroupPlaylist($I, $group_id);
 
-        $I->sendGet('/api/group/1/playlists/' . $id);
+        $I->sendGet('/api/group/' . $group_id . '/playlists/' . $id);
 
         $I->seeResponseCodeIs(HttpCode::OK);
         $I->seeResponseIsJson();
@@ -46,10 +40,8 @@ class GroupPlaylistControllerCest
 
     public function createGroupPlaylist(ApiTester $I)
     {
-        $I->sendPost('/api/group/1/playlists', [
-            'name'       => 'Nový skupinový playlist',
-            'is_private' => true,
-        ]);
+        $group_id = $this->prepareGroup($I);
+        $id       = $this->prepareGroupPlaylist($I, $group_id);
 
         $I->seeResponseCodeIs(HttpCode::OK);
         $I->seeResponseContainsJson([
@@ -105,14 +97,24 @@ class GroupPlaylistControllerCest
      * @return array
      * @throws Exception
      */
-    private function prepareGroupPlaylist(ApiTester $I): int
+    private function prepareGroupPlaylist(ApiTester $I, $group_id): int
     {
-        $I->sendPost('/api/group/1/playlists', [
+        $I->sendPost('/api/group/' . $group_id . '/playlists', [
             'name' => 'Skupinový playlist ',
         ]);
 
         $id = $I->grabDataFromResponseByJsonPath('id');
 
         return $id[0];
+    }
+
+
+    private function prepareGroup(ApiTester $I): int
+    {
+        $I->sendPost('/api/groups/', [
+            'name' => 'Nová skupina',
+        ]);
+
+        return $I->grabDataFromResponseByJsonPath('id')[0];
     }
 }

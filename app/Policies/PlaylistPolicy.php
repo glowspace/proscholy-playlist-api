@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Models\Group;
 use App\Models\Playlist;
 use App\Models\User;
 use Exception;
@@ -20,7 +21,7 @@ class PlaylistPolicy
      * @return bool
      * @throws Exception
      */
-    public function view(User $user, Playlist $playlist): bool
+    public function view(User $user, Playlist $playlist, ?Group $group): bool
     {
         if ($playlist->isUserPlaylist())
         {
@@ -31,12 +32,34 @@ class PlaylistPolicy
             }
 
             // User must be owner of playlist.
-            if ( ! $this->checkIfUserIsOwnerOfPlaylist($playlist, $user))
+            if ($this->checkIfUserIsOwnerOfPlaylist($playlist, $user))
+            {
+                return true;
+            }
+
+            return false;
+        }
+        elseif ($playlist->isGroupPlaylist())
+        {
+            // Playlist is public.
+            if ( ! $playlist->is_private)
+            {
+                return true;
+            }
+
+            // Playlist must belong to requested group
+            if ($playlist->group_id != $group->id)
             {
                 return false;
             }
 
-            return true;
+            // User is member of group
+            if ($user->can('show', $playlist->group))
+            {
+                return true;
+            }
+
+            return false;
         }
 
         throw new Exception('Invalid playlist type during authorization.');
@@ -46,10 +69,18 @@ class PlaylistPolicy
     /**
      * Determine whether the user can create models.
      *
+     * @param User       $user
+     * @param Group|null $group
+     *
      * @return bool
      */
-    public function create(): bool
+    public function create(User $user, ?Group $group): bool
     {
+        if ($group && $user->cannot('update', $group))
+        {
+            return false;
+        }
+
         return true;
     }
 
