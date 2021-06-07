@@ -39,9 +39,6 @@ class UserPlaylistController extends Controller
     ) {
         $this->playlistRepository = $playlistRepository;
         $this->userRepository     = $userRepository;
-
-        // TODO: only for early prototyping!!!
-        Auth::login(User::first());
     }
 
 

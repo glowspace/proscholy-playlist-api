@@ -6,6 +6,8 @@ namespace App\Repository;
 
 use App\Models\Group;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 
 class GroupRepository extends Repository
 {
@@ -46,16 +48,41 @@ class GroupRepository extends Repository
     public function delete(Group $group)
     {
         $group->users()->detach();
+        $group->delete();
     }
 
 
-    public function checkIfAlreadyMember(Group $group, $member): bool
+    public function checkIfUserIsMemberOfGroup(Group $group, User $user): bool
     {
-        if ($group->users()->contain($member))
+        if ($this->findUserInGroup($group, $user->id))
         {
             return true;
         }
 
         return false;
+    }
+
+
+    public function checkIfUserIsAdminOfGroup(Group $group, User $user): bool
+    {
+        if ($this->findUserInGroup($group, $user->id)->pivot->role == User::ROLE_ADMIN)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+
+    /**
+     * @param Group $group
+     * @param int   $user_id
+     *
+     * @return User|Collection|Model|null
+     */
+    public function findUserInGroup(Group $group, int $user_id)
+    {
+        return $group->users()
+            ->find($user_id);
     }
 }

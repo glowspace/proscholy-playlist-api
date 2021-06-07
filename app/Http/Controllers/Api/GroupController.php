@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Repository\GroupRepository;
 use Exception;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
@@ -24,6 +25,9 @@ class GroupController extends Controller
     public function __construct(GroupRepository $groupRepository)
     {
         $this->group_repository = $groupRepository;
+
+        // TODO: only for early prototyping!!!
+        Auth::login(User::first());
     }
 
 
@@ -58,6 +62,7 @@ class GroupController extends Controller
         ]);
 
         $group = $this->group_repository->createGroup($request['name']);
+        $this->group_repository->addMember($group, Auth::user(), User::ROLE_ADMIN);
 
         return new Response($group);
     }
@@ -100,6 +105,18 @@ class GroupController extends Controller
             'dashboard_message' => 'string',
         ]);
 
+        if ($request->has('name'))
+        {
+            $group->name = $request['name'];
+        }
+
+        if ($request->has('dashboard_message'))
+        {
+            $group->dashboard_message = $request['dashboard_message'];
+        }
+
+        $group->save();
+
         return new Response($group);
     }
 
@@ -119,7 +136,7 @@ class GroupController extends Controller
 
         $member = User::findOrFail($request->input('user_id'));
 
-        if ($this->group_repository->checkIfAlreadyMember($group, $member))
+        if ($this->group_repository->checkIfUserIsMemberOfGroup($group, $member))
         {
             throw new Exception("User is already member of this group.", 403);
         }
@@ -147,7 +164,7 @@ class GroupController extends Controller
         $member = User::findOrFail($request->input('user_id'));
         $role   = $request->input('role');
 
-        if ( ! $this->group_repository->checkIfAlreadyMember($group, $member))
+        if ( ! $this->group_repository->checkIfUserIsMemberOfGroup($group, $member))
         {
             throw new Exception("User is not member of this group.", 403);
         }
@@ -171,11 +188,19 @@ class GroupController extends Controller
             'user_id' => 'exists:users',
         ]);
 
-        $member = User::findOrFail($request->input('user_id'));
 
-        if ( ! $this->group_repository->checkIfAlreadyMember($group, $member))
+        $member = $this->group_repository->findUserInGroup($group, $request->input('user_id'));
+
+        $new_member_collection = $group->users->forget($member->id);
+
+        if ( ! $this->checkNewMemberCollectionIntegrity($new_member_collection))
         {
-            throw new Exception("User is not member of this group.", 403);
+            throw new Exception('Cannot remove this user from group because there would be no admin.', Response::HTTP_BAD_REQUEST);
+        }
+
+        if ( ! $this->group_repository->checkIfUserIsMemberOfGroup($group, $member))
+        {
+            throw new Exception("User is not member of this group.", Response::HTTP_BAD_REQUEST);
         }
 
         $this->group_repository->removeMember($group, $member);
@@ -199,5 +224,20 @@ class GroupController extends Controller
         $this->group_repository->delete($group);
 
         return new Response(['message' => 'Group was deleted.'], Response::HTTP_NO_CONTENT);
+    }
+
+
+    private function checkNewMemberCollectionIntegrity(Collection $member_collection): bool
+    {
+        // Group must have at least 1 admin
+        foreach ($member_collection as $user)
+        {
+            if ($user->pivot->role == User::ROLE_ADMIN)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

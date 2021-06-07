@@ -1,8 +1,11 @@
 <?php
 
 use App\Http\Controllers\Api\Group\PlaylistController;
+use App\Http\Controllers\Api\GroupController;
 use App\Http\Controllers\Api\UserPlaylistController;
 use App\Http\Controllers\IndexController;
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -18,8 +21,11 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [IndexController::class, 'index']);
 
+// User endpoints
 Route::apiResource('playlists', UserPlaylistController::class);
+Route::apiResource('groups', GroupController::class);
 
+// Group endpoints
 Route::group([
     'prefix' => '/group/{group}',
 ], function ()
