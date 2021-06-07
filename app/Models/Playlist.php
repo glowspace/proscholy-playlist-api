@@ -8,18 +8,18 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * App\Models\Playlist
  *
- * @property int $id
- * @property string $name
- * @property int $is_private
- * @property int|null $user_id
- * @property int|null $group_id
- * @property string|null $datetime
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\Group|null $group
+ * @property int                                                                        $id
+ * @property string                                                                     $name
+ * @property int                                                                        $is_private
+ * @property int|null                                                                   $user_id
+ * @property int|null                                                                   $group_id
+ * @property string|null                                                                $datetime
+ * @property \Illuminate\Support\Carbon|null                                            $created_at
+ * @property \Illuminate\Support\Carbon|null                                            $updated_at
+ * @property-read \App\Models\Group|null                                                $group
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\PlaylistRecord[] $playlist_records
- * @property-read int|null $playlist_records_count
- * @property-read \App\Models\User|null $user
+ * @property-read int|null                                                              $playlist_records_count
+ * @property-read \App\Models\User|null                                                 $user
  * @method static \Illuminate\Database\Eloquent\Builder|Playlist newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Playlist newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Playlist query()
@@ -59,6 +59,7 @@ class Playlist extends Model
     {
         $record                = new PlaylistRecord();
         $record->playlist_id   = $this->id;
+        $record->name          = 'Nový záznam v playlistu';
         $record->song_lyric_id = $song_lyric_id;
         $record->title         = $title;
         $record->order         = 1;
@@ -70,7 +71,7 @@ class Playlist extends Model
 
     public function isUserPlaylist(): bool
     {
-        if($this->user_id)
+        if ($this->user_id)
         {
             return true;
         }
@@ -78,9 +79,10 @@ class Playlist extends Model
         return false;
     }
 
+
     public function isGroupPlaylist(): bool
     {
-        if($this->group_id)
+        if ($this->group_id)
         {
             return true;
         }
