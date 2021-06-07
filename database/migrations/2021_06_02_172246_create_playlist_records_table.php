@@ -17,6 +17,7 @@ class CreatePlaylistRecordsTable extends Migration
         {
             $table->id();
             $table->unsignedInteger('playlist_id');
+            $table->string('type')->default('song_lyric');
             $table->unsignedInteger('song_lyric_id')->nullable();
             $table->string('title')->nullable();
             $table->unsignedInteger('order');

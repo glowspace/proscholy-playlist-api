@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Repository\GroupRepository;
 use App\Repository\PlaylistRepository;
 use App\Repository\UserRepository;
 use Illuminate\Database\Seeder;
