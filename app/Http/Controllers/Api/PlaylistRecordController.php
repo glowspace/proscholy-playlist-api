@@ -97,23 +97,12 @@ class PlaylistRecordController extends Controller
      */
     public function update(Request $request, PlaylistRecord $playlist_record)
     {
-        $this->validate($request, [
-            'type'          => [
-                'required',
-                'string',
-                Rule::in([
-                    PlaylistRecord::TYPE_PROSCHOLY,
-                    PlaylistRecord::TYPE_CUSTOM,
-                ]),
-            ],
-            'song_lyric_id' => 'required|int',
-            'title_tag_id'  => 'int',
-            'title_custom'  => 'string',
-        ]);
+        $this->validateUpdateRequest($request);
 
         $playlist = Playlist::findOrFail($request['playlist_id']);
 
         # TODO: authorize
+
         if ($request->has('type'))
         {
             $playlist_record->type = $request['type'];
@@ -136,10 +125,16 @@ class PlaylistRecordController extends Controller
             $name = $this->getSongNameForProScholySongLyricsId($request['song_lyric_id']);
         }
 
+        $playlist_record->name = $name;
+
+        // Title
         $playlist_record = $this->chooseTitleFromRequest($playlist_record, $request);
 
-        $playlist_record->name  = $name;
-        $playlist_record->order = $playlist->getNewRecordOrder();
+        if ($request->has('order'))
+        {
+            $playlist_record->order = $playlist->getNewRecordOrder();
+        }
+
         $playlist_record->save();
 
         return new Response($playlist_record);
@@ -155,7 +150,9 @@ class PlaylistRecordController extends Controller
      */
     public function destroy(PlaylistRecord $playlistRecord)
     {
-        //
+        # TODO: Authorize
+
+        $playlistRecord->delete();
     }
 
 
@@ -186,7 +183,7 @@ class PlaylistRecordController extends Controller
     }
 
 
-    private function chooseTitleFromRequest(PlaylistRecord $playlist_record, Request $request)
+    private function chooseTitleFromRequest(PlaylistRecord $playlist_record, Request $request): PlaylistRecord
     {
         // Both title tag id and custom string provided.
         if ($request->has('title_tag_id') && $request->has('title_custom'))
@@ -199,9 +196,8 @@ class PlaylistRecordController extends Controller
         // Empty title
         if ( ! $request->has('title_tag_id') && ! $request->has('title_custom'))
         {
-            throw ValidationException::withMessages([
-                'title_tag_id' => ['You have to set title_tag_id or title_custom.'],
-            ]);
+            $playlist_record->title_tag_id = null;
+            $playlist_record->title_custom = null;
         }
 
         if ($request->has('title_tag_id'))
@@ -217,5 +213,28 @@ class PlaylistRecordController extends Controller
         }
 
         return $playlist_record;
+    }
+
+
+    /**
+     * @param Request $request
+     *
+     * @throws ValidationException
+     */
+    private function validateUpdateRequest(Request $request): void
+    {
+        $this->validate($request, [
+            'type'          => [
+                'required',
+                'string',
+                Rule::in([
+                    PlaylistRecord::TYPE_PROSCHOLY,
+                    PlaylistRecord::TYPE_CUSTOM,
+                ]),
+            ],
+            'song_lyric_id' => 'required|int',
+            'title_tag_id'  => 'int',
+            'title_custom'  => 'string',
+        ]);
     }
 }

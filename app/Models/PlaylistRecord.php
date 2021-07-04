@@ -26,6 +26,16 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|PlaylistRecord whereTitle($value)
  * @method static \Illuminate\Database\Eloquent\Builder|PlaylistRecord whereUpdatedAt($value)
  * @mixin \Eloquent
+ * @property string $type
+ * @property int|null $title_tag_id
+ * @property string|null $title_custom
+ * @property string $name
+ * @property int $previous_record_id
+ * @method static \Illuminate\Database\Eloquent\Builder|PlaylistRecord whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|PlaylistRecord wherePreviousRecordId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|PlaylistRecord whereTitleCustom($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|PlaylistRecord whereTitleTagId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|PlaylistRecord whereType($value)
  */
 class PlaylistRecord extends Model
 {

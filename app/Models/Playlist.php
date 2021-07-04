@@ -32,6 +32,8 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|Playlist whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Playlist whereUserId($value)
  * @mixin \Eloquent
+ * @property int $is_archived
+ * @method static \Illuminate\Database\Eloquent\Builder|Playlist whereIsArchived($value)
  */
 class Playlist extends Model
 {
