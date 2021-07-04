@@ -15,8 +15,9 @@ class PlaylistPolicy
     /**
      * Determine whether the user can view the model.
      *
-     * @param User     $user
-     * @param Playlist $playlist
+     * @param User       $user
+     * @param Playlist   $playlist
+     * @param Group|null $group
      *
      * @return bool
      * @throws Exception
@@ -36,10 +37,9 @@ class PlaylistPolicy
             {
                 return true;
             }
-
-            return false;
         }
-        elseif ($playlist->isGroupPlaylist())
+
+        if ($playlist->isGroupPlaylist())
         {
             // Playlist is public.
             if ( ! $playlist->is_private)
@@ -58,11 +58,9 @@ class PlaylistPolicy
             {
                 return true;
             }
-
-            return false;
         }
 
-        throw new Exception('Invalid playlist type during authorization.');
+        return false;
     }
 
 
@@ -76,58 +74,84 @@ class PlaylistPolicy
      */
     public function create(User $user, ?Group $group): bool
     {
-        if ($group && $user->cannot('update', $group))
+        // Personal playlist
+        if ( ! $group)
         {
-            return false;
+            return true;
         }
 
-        return true;
+        // New group playlist
+        if ($user->can('update', $group))
+        {
+            return true;
+        }
+
+        return false;
     }
 
 
     /**
      * Determine whether the user can update the model.
      *
-     * @param User     $user
-     * @param Playlist $playlist
+     * @param User       $user
+     * @param Playlist   $playlist
+     * @param Group|null $group
      *
      * @return bool
      */
-    public function update(User $user, Playlist $playlist): bool
+    public function update(User $user, Playlist $playlist, ?Group $group): bool
     {
+        // Update user playlist
         if ($playlist->isUserPlaylist())
         {
             // User must be owner of playlist.
-            if ( ! $this->checkIfUserIsOwnerOfPlaylist($playlist, $user))
+            if ($this->checkIfUserIsOwnerOfPlaylist($playlist, $user))
             {
-                return false;
+                return true;
             }
         }
 
-        return true;
+        if ($playlist->isGroupPlaylist())
+        {
+            if ($user->can('update', $group))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
 
     /**
      * Determine whether the user can delete the model.
      *
-     * @param User     $user
-     * @param Playlist $playlist
+     * @param User       $user
+     * @param Playlist   $playlist
+     * @param Group|null $group
      *
      * @return bool
      */
-    public function delete(User $user, Playlist $playlist): bool
+    public function delete(User $user, Playlist $playlist, ?Group $group): bool
     {
         if ($playlist->isUserPlaylist())
         {
             // User must be owner of playlist.
-            if ( ! $this->checkIfUserIsOwnerOfPlaylist($playlist, $user))
+            if ($this->checkIfUserIsOwnerOfPlaylist($playlist, $user))
             {
-                return false;
+                return true;
             }
         }
 
-        return true;
+        if ($playlist->isGroupPlaylist())
+        {
+            if ($user->can('update', $group))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
 

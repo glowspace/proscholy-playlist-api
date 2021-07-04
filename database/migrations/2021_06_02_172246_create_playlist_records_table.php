@@ -17,10 +17,11 @@ class CreatePlaylistRecordsTable extends Migration
         {
             $table->id();
             $table->unsignedInteger('playlist_id');
-            $table->string('type')->default('song_lyric');
+            $table->string('type');
+            $table->unsignedInteger('song_lyric_id');
+            $table->unsignedInteger('title_tag_id')->nullable();
+            $table->string('title_custom')->nullable();
             $table->string('name');
-            $table->unsignedInteger('song_lyric_id')->nullable();
-            $table->string('title')->nullable();
             $table->unsignedInteger('order');
             $table->timestamps();
         });

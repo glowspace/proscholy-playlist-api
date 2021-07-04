@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\Api\Personal;
 
 use App\Http\Controllers\Controller;
 use App\Models\Group;
@@ -55,11 +55,11 @@ class GroupController extends Controller
      */
     public function store(Request $request): Response
     {
-        $this->authorize('create', Group::class);
-
         $this->validate($request, [
             'name' => 'required|string',
         ]);
+
+        $this->authorize('create', Group::class);
 
         $group = $this->group_repository->createGroup($request['name']);
         $this->group_repository->addMember($group, Auth::user(), User::ROLE_ADMIN);

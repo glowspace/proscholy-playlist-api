@@ -35,13 +35,21 @@ class PlaylistRepository extends Repository
 
     public function createGroupPlaylist($name, Group $group, bool $private): Playlist
     {
-        $playlist             = new Playlist();
-        $playlist->name       = $name;
-        $playlist->group_id   = $group->id;
-        $playlist->is_private = $private;
+        $playlist              = new Playlist();
+        $playlist->name        = $name;
+        $playlist->group_id    = $group->id;
+        $playlist->is_private  = $private;
+        $playlist->is_archived = false;
         $playlist->save();
 
         return $playlist;
+    }
+
+
+    public function deleteGroupPlaylist(Playlist $playlist)
+    {
+        $playlist->playlist_records()->delete();
+        $playlist->delete();
     }
 
 

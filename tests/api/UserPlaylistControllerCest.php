@@ -5,7 +5,7 @@ use Codeception\Util\HttpCode;
 /**
  * Class IndexControllerCest
  *
- * @see \App\Http\Controllers\Api\UserPlaylistController
+ * @see \App\Http\Controllers\Api\PlaylistController
  */
 class UserPlaylistControllerCest
 {

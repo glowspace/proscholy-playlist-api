@@ -8,11 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * App\Models\PlaylistRecord
  *
- * @property int $id
- * @property int $playlist_id
- * @property int|null $song_lyric_id
- * @property string|null $title
- * @property int $order
+ * @property int                             $id
+ * @property int                             $playlist_id
+ * @property int|null                        $song_lyric_id
+ * @property string|null                     $title
+ * @property int                             $order
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @method static \Illuminate\Database\Eloquent\Builder|PlaylistRecord newModelQuery()
@@ -30,4 +30,7 @@ use Illuminate\Database\Eloquent\Model;
 class PlaylistRecord extends Model
 {
     use HasFactory;
+
+    const TYPE_PROSCHOLY = 'proscholy';
+    const TYPE_CUSTOM = 'custom';
 }

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "beb5a7c5b837d1ee989d559289a7b44e",
+    "content-hash": "6f7081dc73ac2c943f15d93d665d61db",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -2001,6 +2001,128 @@
                 }
             ],
             "time": "2021-04-26T11:24:25+00:00"
+        },
+        {
+            "name": "gmostafa/php-graphql-client",
+            "version": "v1.10",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mghoneimy/php-graphql-client.git",
+                "reference": "7e2d6615007f6f4415907233d20e576dc0b464a2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mghoneimy/php-graphql-client/zipball/7e2d6615007f6f4415907233d20e576dc0b464a2",
+                "reference": "7e2d6615007f6f4415907233d20e576dc0b464a2",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "guzzlehttp/guzzle": "^6.3|^7.0.1",
+                "php": "^7.1 || ^8.0",
+                "psr/http-client": "^1.0",
+                "psr/http-message": "^1.0"
+            },
+            "require-dev": {
+                "codacy/coverage": "^1.4",
+                "phpunit/phpunit": "^7.5|^8.0"
+            },
+            "suggest": {
+                "gmostafa/php-graphql-oqm": "To have object-to-query mapping support"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "GraphQL\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Mostafa Ghoneimy",
+                    "email": "emostafagh@gmail.com"
+                }
+            ],
+            "description": "GraphQL client and query builder.",
+            "keywords": [
+                "builder",
+                "client",
+                "graph-ql",
+                "graphql",
+                "php",
+                "query",
+                "query-builder"
+            ],
+            "support": {
+                "issues": "https://github.com/mghoneimy/php-graphql-client/issues",
+                "source": "https://github.com/mghoneimy/php-graphql-client/tree/v1.10"
+            },
+            "time": "2021-03-22T01:23:33+00:00"
+        },
+        {
+            "name": "gmostafa/php-graphql-oqm",
+            "version": "v1.3.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mghoneimy/php-graphql-oqm.git",
+                "reference": "aeee284434ad0194cdac8acdcc1d7d27f50f165c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mghoneimy/php-graphql-oqm/zipball/aeee284434ad0194cdac8acdcc1d7d27f50f165c",
+                "reference": "aeee284434ad0194cdac8acdcc1d7d27f50f165c",
+                "shasum": ""
+            },
+            "require": {
+                "gmostafa/php-graphql-client": "^1.6 || ^1.9",
+                "php": "^7.1 || ^8.0"
+            },
+            "require-dev": {
+                "codacy/coverage": "^1.4",
+                "ext-json": "*",
+                "phpunit/phpunit": "^7.5|^8.0"
+            },
+            "bin": [
+                "bin/generate_schema_objects"
+            ],
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "GraphQL\\": "src/",
+                    "GraphQL\\SchemaObject\\": "schema_object/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Mostafa Ghoneimy",
+                    "email": "emostafagh@gmail.com"
+                }
+            ],
+            "description": "GraphQL Object-to-Query Mapper (QOM) which generates objects from API schema",
+            "keywords": [
+                "builder",
+                "generator",
+                "graph-ql",
+                "graphql",
+                "object",
+                "object-mapper",
+                "php",
+                "query",
+                "query-builder",
+                "query-generator"
+            ],
+            "support": {
+                "issues": "https://github.com/mghoneimy/php-graphql-oqm/issues",
+                "source": "https://github.com/mghoneimy/php-graphql-oqm/tree/v1.3.1"
+            },
+            "time": "2021-02-21T19:33:08+00:00"
         },
         {
             "name": "graham-campbell/result-type",

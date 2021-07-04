@@ -33,9 +33,8 @@ class GroupPolicy
      */
     public function view(User $user, Group $group): bool
     {
-        $is_member = $this->group_repository->checkIfUserIsMemberOfGroup($group, $user);
-
-        if ($is_member)
+        // User must be member
+        if ($this->group_repository->checkIfUserIsMemberOfGroup($group, $user))
         {
             return true;
         }

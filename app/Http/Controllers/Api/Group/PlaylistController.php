@@ -8,10 +8,12 @@ use App\Models\Playlist;
 use App\Models\User;
 use App\Repository\PlaylistRepository;
 use App\Repository\UserRepository;
+use Carbon\Carbon;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use PHPUnit\Framework\Exception;
 
 /**
  * Class PlaylistController
@@ -54,6 +56,7 @@ class PlaylistController extends Controller
      */
     public function index($group_id): Response
     {
+        // Group from route param
         $group = Group::findOrFail($group_id);
 
         $playlists = $this->playlistRepository->getGroupPlaylistsWithRecords($group);
@@ -70,6 +73,7 @@ class PlaylistController extends Controller
      */
     public function store($group_id, Request $request)
     {
+        // Group from route param
         $group = Group::findOrFail($group_id);
 
         $this->authorize('create', [Playlist::class, $group]);
@@ -91,7 +95,10 @@ class PlaylistController extends Controller
      */
     public function show($group_id, Playlist $playlist)
     {
+        // Group from route param
         $group = Group::findOrFail($group_id);
+
+        $this->validateIsGroupPlaylist($playlist);
         $this->authorize('view', [$playlist, $group]);
 
         return new Response($playlist);
@@ -99,41 +106,93 @@ class PlaylistController extends Controller
 
 
     /**
-     * Show the form for editing the specified resource.
-     *
-     * @param int $id
-     *
-     * @return Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-
-    /**
      * Update the specified resource in storage.
      *
-     * @param Request $request
-     * @param int     $id
+     * @param          $group_id
+     * @param Playlist $playlist
+     * @param Request  $request
      *
      * @return Response
+     * @throws AuthorizationException
      */
-    public function update(Request $request, $id)
+    public function update($group_id, Playlist $playlist, Request $request): Response
     {
-        //
+        // Group from route param
+        $group = Group::findOrFail($group_id);
+
+        $this->validate($request, [
+            'name'        => 'string',
+            'is_private'  => 'bool',
+            'is_archived' => 'bool',
+            'datetime'    => 'date',
+        ]);
+
+        $this->validateIsGroupPlaylist($playlist);
+        $this->authorize('update', [Playlist::class, $group]);
+
+        if ($request->has('name'))
+        {
+            $playlist->name = $request['name'];
+        }
+
+        if ($request->has('is_private'))
+        {
+            $playlist->is_private = $request['is_private'];
+        }
+
+        if ($request->has('is_archived'))
+        {
+            $playlist->is_archived = $request['is_archived'];
+        }
+
+        if ($request->has('datetime'))
+        {
+            $playlist->datetime = Carbon::parse($request['datetime']);
+        }
+
+        $playlist->save();
+
+        return new Response($playlist);
     }
 
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param int $id
+     * @param          $group_id
+     * @param Playlist $playlist
      *
      * @return Response
+     * @throws AuthorizationException
      */
-    public function destroy($id)
+    public function destroy($group_id, Playlist $playlist)
     {
-        //
+        // Group from route param
+        $group = Group::findOrFail($group_id);
+
+        $this->validateIsGroupPlaylist($playlist);
+        $this->authorize('delete', [Playlist::class, $group]);
+
+        $this->playlistRepository->deleteGroupPlaylist($playlist);
+
+        return new Response('Playlist deleted.', Response::HTTP_NO_CONTENT);
+    }
+
+
+    /**
+     * Throw exception if playlist is not user playlist.
+     *
+     * @param Playlist $playlist
+     *
+     * @return bool
+     */
+    public function validateIsGroupPlaylist(Playlist $playlist): bool
+    {
+        if ( ! $playlist->isGroupPlaylist())
+        {
+            throw new Exception("This is not group playlist.");
+        }
+
+        return true;
     }
 }

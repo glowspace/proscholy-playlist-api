@@ -89,4 +89,19 @@ class Playlist extends Model
 
         return false;
     }
+
+
+    public function getNewRecordOrder()
+    {
+        $last = $this->playlist_records()->orderByDesc('order')->first();
+
+        if ($last)
+        {
+            return $last->order + 1;
+        }
+        else
+        {
+            return 1;
+        }
+    }
 }
