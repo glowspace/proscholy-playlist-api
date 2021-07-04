@@ -76,7 +76,7 @@ class PlaylistController extends Controller
         // Group from route param
         $group = Group::findOrFail($group_id);
 
-        $this->authorize('create', [Playlist::class, $group]);
+        $this->authorize('update', [Playlist::class, $group]);
         $playlist = $this->playlistRepository->createGroupPlaylist($request['name'], $group, true);
 
         return new Response($playlist);
@@ -93,13 +93,12 @@ class PlaylistController extends Controller
      * @throws AuthorizationException
      * @see \GroupPlaylistControllerCest::showGroupPlaylist()
      */
-    public function show($group_id, Playlist $playlist)
+    public function show($group_id, Playlist $playlist): Response
     {
-        // Group from route param
-        $group = Group::findOrFail($group_id);
+        $this->validateRouteIntegrity($group_id, $playlist);
 
         $this->validateIsGroupPlaylist($playlist);
-        $this->authorize('view', [$playlist, $group]);
+        $this->authorize('view', $playlist);
 
         return new Response($playlist);
     }
@@ -117,8 +116,7 @@ class PlaylistController extends Controller
      */
     public function update($group_id, Playlist $playlist, Request $request): Response
     {
-        // Group from route param
-        $group = Group::findOrFail($group_id);
+        $this->validateRouteIntegrity($group_id, $playlist);
 
         $this->validate($request, [
             'name'        => 'string',
@@ -128,7 +126,7 @@ class PlaylistController extends Controller
         ]);
 
         $this->validateIsGroupPlaylist($playlist);
-        $this->authorize('update', [Playlist::class, $group]);
+        $this->authorize('update', $playlist);
 
         if ($request->has('name'))
         {
@@ -167,11 +165,10 @@ class PlaylistController extends Controller
      */
     public function destroy($group_id, Playlist $playlist)
     {
-        // Group from route param
-        $group = Group::findOrFail($group_id);
+        $this->validateRouteIntegrity($group_id, $playlist);
 
         $this->validateIsGroupPlaylist($playlist);
-        $this->authorize('delete', [Playlist::class, $group]);
+        $this->authorize('delete', $playlist);
 
         $this->playlistRepository->deleteGroupPlaylist($playlist);
 
@@ -194,5 +191,17 @@ class PlaylistController extends Controller
         }
 
         return true;
+    }
+
+
+    private function validateRouteIntegrity($group_id, Playlist $playlist)
+    {
+        // Playlist must belong to requested group
+        if ($playlist->group_id != $group_id)
+        {
+            throw new Exception('Playlist not found in this group.');
+        }
+
+        return Group::findOrFail($group_id);
     }
 }

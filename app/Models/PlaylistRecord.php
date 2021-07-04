@@ -36,6 +36,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|PlaylistRecord whereTitleCustom($value)
  * @method static \Illuminate\Database\Eloquent\Builder|PlaylistRecord whereTitleTagId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|PlaylistRecord whereType($value)
+ * @property-read \App\Models\Playlist $playlist
  */
 class PlaylistRecord extends Model
 {
@@ -43,4 +44,10 @@ class PlaylistRecord extends Model
 
     const TYPE_PROSCHOLY = 'proscholy';
     const TYPE_CUSTOM = 'custom';
+
+
+    public function playlist()
+    {
+        return $this->belongsTo(Playlist::class);
+    }
 }

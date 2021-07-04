@@ -22,7 +22,7 @@ class PlaylistPolicy
      * @return bool
      * @throws Exception
      */
-    public function view(User $user, Playlist $playlist, ?Group $group): bool
+    public function view(User $user, Playlist $playlist): bool
     {
         if ($playlist->isUserPlaylist())
         {
@@ -45,12 +45,6 @@ class PlaylistPolicy
             if ( ! $playlist->is_private)
             {
                 return true;
-            }
-
-            // Playlist must belong to requested group
-            if ($playlist->group_id != $group->id)
-            {
-                return false;
             }
 
             // User is member of group
@@ -132,7 +126,7 @@ class PlaylistPolicy
      *
      * @return bool
      */
-    public function delete(User $user, Playlist $playlist, ?Group $group): bool
+    public function delete(User $user, Playlist $playlist): bool
     {
         if ($playlist->isUserPlaylist())
         {
@@ -145,7 +139,7 @@ class PlaylistPolicy
 
         if ($playlist->isGroupPlaylist())
         {
-            if ($user->can('update', $group))
+            if ($user->can('update', $playlist->group))
             {
                 return true;
             }

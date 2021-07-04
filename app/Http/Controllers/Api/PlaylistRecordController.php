@@ -80,7 +80,7 @@ class PlaylistRecordController extends Controller
      */
     public function show(PlaylistRecord $playlistRecord): Response
     {
-        # TODO authorize
+        $this->authorize('view', $playlistRecord->playlist);
 
         return new Response($playlistRecord);
     }
@@ -94,6 +94,7 @@ class PlaylistRecordController extends Controller
      *
      * @return Response
      * @throws ValidationException
+     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function update(Request $request, PlaylistRecord $playlist_record)
     {
@@ -101,7 +102,7 @@ class PlaylistRecordController extends Controller
 
         $playlist = Playlist::findOrFail($request['playlist_id']);
 
-        # TODO: authorize
+        $this->authorize('update', $playlist);
 
         if ($request->has('type'))
         {
@@ -129,12 +130,6 @@ class PlaylistRecordController extends Controller
 
         // Title
         $playlist_record = $this->chooseTitleFromRequest($playlist_record, $request);
-
-        if ($request->has('order'))
-        {
-            $playlist_record->order = $playlist->getNewRecordOrder();
-        }
-
         $playlist_record->save();
 
         return new Response($playlist_record);
@@ -147,12 +142,17 @@ class PlaylistRecordController extends Controller
      * @param PlaylistRecord $playlistRecord
      *
      * @return Response
+     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function destroy(PlaylistRecord $playlistRecord)
     {
-        # TODO: Authorize
+        $this->authorize('delete', $playlistRecord->playlist);
+
+
 
         $playlistRecord->delete();
+
+        return new Response('Playlist record deleted.', Response::HTTP_NO_CONTENT);
     }
 
 
