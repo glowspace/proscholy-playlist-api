@@ -8,6 +8,7 @@ use App\Models\Playlist;
 use App\Models\PlaylistRecord;
 use GraphQL\Client;
 use GraphQL\Query;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Validation\Rule;
@@ -42,6 +43,8 @@ class PlaylistRecordController extends Controller
 
         $playlist = Playlist::findOrFail($request['playlist_id']);
 
+        $this->authorize('update', $playlist);
+
         // Validate custom song exists
         if ($request['type'] == PlaylistRecord::TYPE_CUSTOM)
         {
@@ -52,8 +55,6 @@ class PlaylistRecordController extends Controller
         {
             $name = $this->getSongNameForProScholySongLyricsId($request['song_lyric_id']);
         }
-
-        # TODO: authorize
 
         // Create new playlist record
         $playlist_record                = new PlaylistRecord();
@@ -77,7 +78,7 @@ class PlaylistRecordController extends Controller
      * @param PlaylistRecord $playlistRecord
      *
      * @return Response
-     * @throws \Illuminate\Auth\Access\AuthorizationException
+     * @throws AuthorizationException
      */
     public function show(PlaylistRecord $playlistRecord): Response
     {
@@ -91,11 +92,11 @@ class PlaylistRecordController extends Controller
      * Update the specified resource in storage.
      *
      * @param Request        $request
-     * @param PlaylistRecord $playlistRecord
+     * @param PlaylistRecord $playlist_record
      *
      * @return Response
+     * @throws AuthorizationException
      * @throws ValidationException
-     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function update(Request $request, PlaylistRecord $playlist_record)
     {
@@ -143,7 +144,7 @@ class PlaylistRecordController extends Controller
      * @param PlaylistRecord $playlistRecord
      *
      * @return Response
-     * @throws \Illuminate\Auth\Access\AuthorizationException
+     * @throws AuthorizationException
      */
     public function destroy(PlaylistRecord $playlistRecord)
     {
