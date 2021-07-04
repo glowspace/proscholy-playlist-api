@@ -23,7 +23,7 @@ class PlaylistRecordController extends Controller
      * @return Response
      * @throws ValidationException
      */
-    public function store(Request $request)
+    public function store(Request $request): Response
     {
         $this->validate($request, [
             'playlist_id'   => 'exists:playlists',
@@ -77,6 +77,7 @@ class PlaylistRecordController extends Controller
      * @param PlaylistRecord $playlistRecord
      *
      * @return Response
+     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function show(PlaylistRecord $playlistRecord): Response
     {
@@ -147,7 +148,6 @@ class PlaylistRecordController extends Controller
     public function destroy(PlaylistRecord $playlistRecord)
     {
         $this->authorize('delete', $playlistRecord->playlist);
-
 
 
         $playlistRecord->delete();
