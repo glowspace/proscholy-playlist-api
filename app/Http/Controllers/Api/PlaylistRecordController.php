@@ -60,10 +60,11 @@ class PlaylistRecordController extends Controller
         $playlist_record->playlist_id   = $playlist->id;
         $playlist_record->type          = $request['type'];
         $playlist_record->song_lyric_id = $request['song_lyric_id'];
-        $playlist_record->title_tag_id  = $request['title_tag_id'];
-        $playlist_record->title_custom  = $request['title_custom'];
-        $playlist_record->name          = $name;
-        $playlist_record->order         = $playlist->getNewRecordOrder();
+
+        $playlist_record = $this->chooseTitleFromRequest($playlist_record, $request);
+
+        $playlist_record->name  = $name;
+        $playlist_record->order = $playlist->getNewRecordOrder();
         $playlist_record->save();
 
         return new Response($playlist_record);
@@ -92,8 +93,9 @@ class PlaylistRecordController extends Controller
      * @param PlaylistRecord $playlistRecord
      *
      * @return Response
+     * @throws ValidationException
      */
-    public function update(Request $request, PlaylistRecord $playlistRecord)
+    public function update(Request $request, PlaylistRecord $playlist_record)
     {
         $this->validate($request, [
             'type'          => [
@@ -111,19 +113,36 @@ class PlaylistRecordController extends Controller
 
         $playlist = Playlist::findOrFail($request['playlist_id']);
 
-        // Validate custom song exists
+        # TODO: authorize
+        if ($request->has('type'))
+        {
+            $playlist_record->type = $request['type'];
+        }
+
+        if ($request->has('song_lyric_id'))
+        {
+            $playlist_record->song_lyric_id = $request['song_lyric_id'];
+        }
+
+        // Get custom song lyric
         if ($request['type'] == PlaylistRecord::TYPE_CUSTOM)
         {
             $custom = $this->validateCustomSong($request['song_lyric_id']);
             $name   = $custom->name;
         }
+        // Fetch ProScholy song lyric
         else
         {
             $name = $this->getSongNameForProScholySongLyricsId($request['song_lyric_id']);
         }
 
-        # TODO: authorize
+        $playlist_record = $this->chooseTitleFromRequest($playlist_record, $request);
 
+        $playlist_record->name  = $name;
+        $playlist_record->order = $playlist->getNewRecordOrder();
+        $playlist_record->save();
+
+        return new Response($playlist_record);
     }
 
 
@@ -164,5 +183,39 @@ class PlaylistRecordController extends Controller
         $res = $client->runQuery($gql);
 
         return $res->getResults()->data->song_lyric->name;
+    }
+
+
+    private function chooseTitleFromRequest(PlaylistRecord $playlist_record, Request $request)
+    {
+        // Both title tag id and custom string provided.
+        if ($request->has('title_tag_id') && $request->has('title_custom'))
+        {
+            throw ValidationException::withMessages([
+                'title_tag_id' => ['You can set only one title_tag_id or one title_custom, but not both at the same time.'],
+            ]);
+        }
+
+        // Empty title
+        if ( ! $request->has('title_tag_id') && ! $request->has('title_custom'))
+        {
+            throw ValidationException::withMessages([
+                'title_tag_id' => ['You have to set title_tag_id or title_custom.'],
+            ]);
+        }
+
+        if ($request->has('title_tag_id'))
+        {
+            $playlist_record->title_tag_id = $request['title_tag_id'];
+            $playlist_record->title_custom = null;
+        }
+
+        if ($request->has('title_custom'))
+        {
+            $playlist_record->title_custom = $request['title_custom'];
+            $playlist_record->title_tag_id = null;
+        }
+
+        return $playlist_record;
     }
 }
