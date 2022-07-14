@@ -15,11 +15,10 @@ class UserRepository extends Repository
     }
 
 
-    public function createUser($name, $email): User
+    public function createUser(): User
     {
         $user        = new User();
-        $user->name  = $name;
-        $user->email = $email;
+        $user->auth_token = '123456789';
         $user->save();
 
         return $user;
