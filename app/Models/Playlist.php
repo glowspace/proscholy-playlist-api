@@ -32,7 +32,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|Playlist whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Playlist whereUserId($value)
  * @mixin \Eloquent
- * @property int $is_archived
+ * @property int                                                                        $is_archived
  * @method static \Illuminate\Database\Eloquent\Builder|Playlist whereIsArchived($value)
  */
 class Playlist extends Model
@@ -60,10 +60,11 @@ class Playlist extends Model
     public function addSongLyricRecord(int $song_lyric_id, $title = null): PlaylistRecord
     {
         $record                = new PlaylistRecord();
+        $record->type          = PlaylistRecord::TYPE_PROSCHOLY;
         $record->playlist_id   = $this->id;
         $record->name          = 'Nový záznam v playlistu';
         $record->song_lyric_id = $song_lyric_id;
-        $record->title         = $title;
+        $record->title_custom  = $title;
         $record->order         = 1;
         $record->save();
 

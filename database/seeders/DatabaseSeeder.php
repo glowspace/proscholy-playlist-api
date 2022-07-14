@@ -20,8 +20,8 @@ class DatabaseSeeder extends Seeder
         $playlist_repository = new PlaylistRepository();
         $group_repository = new GroupRepository();
 
-        $user_1 = $user_repository->createUser('Jan Novák', 'admin@admin.com');
-        $user_2 = $user_repository->createUser('Petr Svetr', 'admin2@admin.com');
+        $user_1 = $user_repository->createUser();
+        $user_2 = $user_repository->createUser();
 
         $playlist_1 = $playlist_repository->createUserPlaylist('Janův playlist 1', $user_1, true);
         $playlist_2 = $playlist_repository->createUserPlaylist('Janův playlist 2', $user_1, true);
